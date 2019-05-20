@@ -1,1 +1,1 @@
-# This is the AI Control. All AI Control will be handled here
+# This is the AI Control, both board setup and actual moves
