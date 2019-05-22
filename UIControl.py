@@ -2,7 +2,7 @@
 from tkinter import *
 
 # Difficulty variable
-difficulty = IntVar()
+difficulty = None
 
 # Main UI elements
 main = Tk()
@@ -46,11 +46,11 @@ def how_to_return():
 
 # How To UI elements
 howToText = Text(howTo)
-howToText.insert()  # TODO: Insert the how to text here
+howToText.insert(END, "Placeholder")  # TODO: Insert the how to text here
 howToText.configure(state=DISABLED)
-howToReturn = Button(settings, text="back", command=how_to_return)
-howToText.pack()
-howToReturn.pack()
+howToReturn = Button(howTo, text="Back", command=how_to_return)
+howToText.pack(side=TOP)
+howToReturn.pack(side=TOP)
 
 
 # Settings UI commands
@@ -65,10 +65,11 @@ D1 = Radiobutton(settings, text="Easy", variable=difficulty, value=1)
 D2 = Radiobutton(settings, text="Medium", variable=difficulty, value=2)
 D3 = Radiobutton(settings, text="Hard", variable=difficulty, value=3)
 settingsReturn = Button(settings, text="Back", command=settings_return)
-settingsLabel.pack()
-D1.pack(anchor=W)
-D2.pack(anchor=W)
-D3.pack(anchor=W)
+settingsLabel.pack(side=TOP)
+D1.pack(anchor=W, side=TOP)
+D2.pack(anchor=W,side=TOP)
+D3.pack(anchor=W,side=TOP)
+settingsReturn.pack(side=TOP)
 
 
 # Initial setup
