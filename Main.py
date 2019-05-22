@@ -1,4 +1,6 @@
 # This is the general program flow and game execution
+import UIControl
+UIControl.setup_menu()
 BASE_BOARD = []
 for i in range(10):  # This creates the stock board
     BASE_BOARD.append([])
