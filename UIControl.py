@@ -1,12 +1,17 @@
 # This is the UI Controls. It will also handle player side input
 from tkinter import *
+from PIL import ImageTk, Image
 
 # Difficulty variable
 difficulty = None
 
 # Main UI elements
 main = Tk()
-window = LabelFrame(main)
+main.title("Battleship")
+main.geometry("2286x1254")
+window = Canvas(main, width=2286, height=1254)
+backgroundImg = ImageTk.PhotoImage(Image.open("Assets/sea image.jpg"))
+window.create_image(2286, 1254, anchor=NW, image=backgroundImg)
 menu = Frame(window)
 howTo = Frame(window)
 settings = Frame(window)
