@@ -82,13 +82,17 @@ D2.pack(anchor=W, side=TOP)
 D3.pack(anchor=W, side=TOP)
 settingsReturn.pack(side=TOP)
 
+# Game board UI elements
+actionLabel = Label(board, text="Place your ships:")
+playerBoard = Canvas(board)
+playerBoard.create_image(0, 0, image="Assets/sea.png", anchor=NW)  # The image is 800x800
+AIBoard = playerBoard
+actionLabel.pack()
+playerBoard.pack()
 
-# Initial setup
+
+# Initial setup and game execution functions
 def setup_menu():
     menuBackground.place(x=0, y=0, relwidth=1, relheight=1)
     menu.pack()
     main.mainloop()
-
-
-# TODO: Transparent UI elements
-# TODO: Make the background fill the full  image
