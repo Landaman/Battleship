@@ -9,13 +9,16 @@ difficulty = None
 main = Tk()
 main.title("Battleship")
 main.geometry("2286x1254")
-window = Canvas(main, width=2286, height=1254)
-backgroundImg = ImageTk.PhotoImage(Image.open("Assets/sea image.jpg"))
-window.create_image(2286, 1254, anchor=NW, image=backgroundImg)
-menu = Frame(window)
-howTo = Frame(window)
-settings = Frame(window)
-board = PanedWindow(window)
+backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
+backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
+menu = Frame(main)
+howTo = Frame(main)
+settings = Frame(main)
+board = Frame(main)
+menuBackground = Label(menu, image=backgroundImageTK)
+howToBackground = Label(howTo, image=backgroundImageTK)
+settingsBackground = Label(howTo, image=backgroundImageTK)
+gameBackground = Label(board, image=backgroundImageTK)
 
 
 # Menu UI commands
@@ -38,6 +41,7 @@ def open_settings():
 playButton = Button(menu, text="Play", command=open_game)
 howToButton = Button(menu, text="How to Play", command=open_how_to)
 settingsButton = Button(menu, text="Settings", command=open_settings)
+menuBackground.place(x=0, y=0, relwidth=1, relheight=1)
 playButton.pack()
 howToButton.pack()
 settingsButton.pack()
@@ -50,10 +54,11 @@ def how_to_return():
 
 
 # How To UI elements
-howToText = Text(howTo)
+howToText = Text(howTo, width=30, height=10)
 howToText.insert(END, "Placeholder")  # TODO: Insert the how to text here
 howToText.configure(state=DISABLED)
 howToReturn = Button(howTo, text="Back", command=how_to_return)
+howToBackground.place(x=0, y=0, relwidth=1, relheight=1)
 howToText.pack(side=TOP)
 howToReturn.pack(side=TOP)
 
@@ -70,15 +75,20 @@ D1 = Radiobutton(settings, text="Easy", variable=difficulty, value=1)
 D2 = Radiobutton(settings, text="Medium", variable=difficulty, value=2)
 D3 = Radiobutton(settings, text="Hard", variable=difficulty, value=3)
 settingsReturn = Button(settings, text="Back", command=settings_return)
+settingsBackground.place(x=0, y=0, relwidth=1, relheight=1)
 settingsLabel.pack(side=TOP)
 D1.pack(anchor=W, side=TOP)
-D2.pack(anchor=W,side=TOP)
-D3.pack(anchor=W,side=TOP)
+D2.pack(anchor=W, side=TOP)
+D3.pack(anchor=W, side=TOP)
 settingsReturn.pack(side=TOP)
 
 
 # Initial setup
 def setup_menu():
+    menuBackground.place(x=0, y=0, relwidth=1, relheight=1)
     menu.pack()
-    window.pack()
     main.mainloop()
+
+
+# TODO: Transparent UI elements
+# TODO: Make the background fill the full  image
