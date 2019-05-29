@@ -55,7 +55,7 @@ def how_to_return():
 
 # How To UI elements
 howToText = Text(howTo, width=30, height=10)
-howToText.insert(END, "Placeholder")  # TODO: Insert the how to text here
+howToText.insert(END, "You and your AI opponent will place ships on a grid and take turns guessing where the other player's ships are. When placing a vertical ship, click the ship then click where you want the top of the ship to be on the board. When placing a horizontal ship, click the ship then click where you want the left end of the ship to be on the board.")  # TODO: Insert the how to text here
 howToText.configure(state=DISABLED)
 howToReturn = Button(howTo, text="Back", command=how_to_return)
 howToBackground.place(x=0, y=0, relwidth=1, relheight=1)
