@@ -1,31 +1,6 @@
 # This is the UI Controls. It will also handle player side input
-import main as game
 from tkinter import *
 from PIL import ImageTk, Image
-
-
-# Classes
-class Ship:
-    def __init__(self, length, image, direction):
-        # Length is the length integer, image an image, direction is 0 for facing up/down, 1 for facing left/right
-        self.length = length
-        self.image = image
-        self.imageTk = ImageTk.PhotoImage(self.image)
-        self.direction = direction
-
-    def check_place(self, xcoord, ycoord):
-        can_place = True
-        for i in range(self.length + 1):
-            if self.direction == 0:
-                if game.playerBoard[xcoord][ycoord + i] != " ":
-                    can_place = False
-                    break
-            else:
-                if game.playerBoard[xcoord + i][ycoord] != " ":
-                    can_place = False
-                    break
-        return can_place
-
 
 # Difficulty variable
 difficulty = None
@@ -33,7 +8,7 @@ difficulty = None
 # Images
 backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
 backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
-gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800
+gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
 gridImageTK = ImageTk.PhotoImage(gridImage)
 
 # Constants
@@ -53,10 +28,74 @@ settingsBackground = Label(settings, image=backgroundImageTK)
 gameBackground = Label(board, image=backgroundImageTK)
 
 
+# Classes
+class ShipCreator:
+    global board, BOARD_OFFSET
+    ShipHolder = Frame(board)
+    ShipHolder.place(x=800, y=BOARD_OFFSET)
+    activeShip = None
+
+    def __init__(self, length, image, direction):
+        # Length is the length integer, image an image, direction is 0 for facing up/down, 1 for facing left/right
+        self.length = length
+        self.imageTk = ImageTk.PhotoImage(image)
+        self.direction = direction
+        self.button = Button(ShipCreator.ShipHolder, image=self.imageTk, command=self.start_place)
+        self.button.pack()
+
+    def start_place(self):
+        actionLabel.configure(text="Click where you'd like the bottom/left of the ship to be:")
+        ShipCreator.activeShip = self
+
+    def check_place(self, xcoord, ycoord):
+        import Main
+        can_place = True
+        for i in range(self.length + 1):
+            if self.direction == 0:
+                if Main.playerBoard[xcoord][ycoord + i] != " ":
+                    can_place = False
+                    break
+            else:
+                if Main.playerBoard[xcoord + i][ycoord] != " ":
+                    can_place = False
+                    break
+        return can_place
+
+    def place(self, xcoord, ycoord):
+        if self.check_place(xcoord, ycoord):
+            playerBoard.create_image(78 * xcoord + 8, 78 * xcoord + 8 + BOARD_OFFSET, image=self.imageTk, anchor=NW)
+            del self.button
+        else:
+            ShipCreator.activeShip=None
+            actionLabel.configure(text="Cannot place a ship there!")
+
+
+class PlaceButton:
+    def __init__(self, xcoord, ycoord):
+        global BOARD_OFFSET
+        self.xcoord = xcoord
+        self.ycoord = ycoord
+        self.button = Button(playerBoard, image=backgroundImageTK, command=self.place)
+        self.button.place(x=78 * xcoord + 8, y=78 * xcoord + 8 + BOARD_OFFSET, anchor=NW)
+
+    def place(self):
+        if ShipCreator.activeShip is not None:
+            ShipCreator.activeShip.place(self.xcoord, self.ycoord)
+
+
 # Menu UI commands
 def open_game():
     menu.pack_forget()
     board.pack(expand=True, fill=BOTH)
+    for i in range(10):
+        for j in range(10):
+            exec("button" + str(i) + str(j) + " = PlaceButton(" + str(i + 1) + "," + str(j + 1) + ")")
+
+    ship1 = ShipCreator() # TODO: Actually finish this and all the stuff below it. Such an L
+    ship2 = ShipCreator()
+    ship3 = ShipCreator()
+    ship4 = ShipCreator()
+    ship5 = ShipCreator()
 
 
 def open_how_to():
@@ -90,7 +129,10 @@ def how_to_return():
 # How To UI elements
 howToElements = Frame(howTo)
 howToText = Text(howToElements, width=30, height=10)
-howToText.insert(END, "You and your AI opponent will place ships on a grid and take turns guessing where the other player's ships are. When placing a vertical ship, click the ship then click where you want the top of the ship to be on the board. When placing a horizontal ship, click the ship then click where you want the left end of the ship to be on the board.")
+howToText.insert(END, "You and your AI opponent will place ships on a grid and take turns guessing where the other "
+                      "player's ships are. When placing a vertical ship, click the ship then click where you want the "
+                      "top of the ship to be on the board. When placing a horizontal ship, click the ship "
+                      "then click where you want the left end of the ship to be on the board.")
 howToText.configure(state=DISABLED)
 howToReturn = Button(howToElements, text="Back", command=how_to_return)
 howToBackground.place(x=0, y=0, relwidth=1, relheight=1)
@@ -121,7 +163,7 @@ optionsArea.place(anchor=CENTER, relx=.5, rely=.45)
 settingsReturn.pack(side=TOP)
 
 # Game board UI elements
-actionLabel = Label(board, text="Place your ships:")
+actionLabel = Label(board, text="Click on a ship to place:")
 playerBoard = Canvas(board)
 playerBoard.create_image(0, 0, image=gridImageTK, anchor=NW)  # The image is 800x800
 AIBoard = playerBoard
