@@ -10,6 +10,11 @@ backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
 backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
 gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
 gridImageTK = ImageTk.PhotoImage(gridImage)
+shipImg1 = Image.open("Assets/Ship1(5).png")
+shipImg2 = Image.open("Assets/Ship2(4).png")
+shipImg3 = Image.open("Assets/Ship3(3).png")
+shipImg4 = Image.open("Assets/Ship4(4).png")
+shipImg5 = Image.open("Assets/Ship5(2).png")
 
 # Constants
 BOARD_OFFSET = 25
@@ -33,6 +38,7 @@ class ShipCreator:
     global board, BOARD_OFFSET
     ShipHolder = Frame(board)
     ShipHolder.place(x=800, y=BOARD_OFFSET)
+    shipNum = 5
     activeShip = None
 
     def __init__(self, length, image, direction):
@@ -62,11 +68,25 @@ class ShipCreator:
         return can_place
 
     def place(self, xcoord, ycoord):
+        import Main
         if self.check_place(xcoord, ycoord):
             playerBoard.create_image(78 * xcoord + 8, 78 * xcoord + 8 + BOARD_OFFSET, image=self.imageTk, anchor=NW)
+            for i in range(self.length + 1):
+                if self.direction == 0:
+                    Main.playerBoard[xcoord][ycoord + i] = "S"
+                else:
+                    Main.playerBoard[xcoord + i][ycoord] = "S"
             del self.button
+            ShipCreator.shipNum -= 1
+            if ShipCreator.shipNum == 0:
+                for i in range(10):
+                    for j in range(10):
+                        exec("del button" + str(i) + str(j))
+
+                del ship1, ship2, ship3, ship4, ship5
+                # TODO: what the hell else can i do
         else:
-            ShipCreator.activeShip=None
+            ShipCreator.activeShip = None
             actionLabel.configure(text="Cannot place a ship there!")
 
 
@@ -84,18 +104,19 @@ class PlaceButton:
 
 
 # Menu UI commands
-def open_game():
+def open_game():  # Initializes the game, making the grid buttons for the players ships
+    global shipImg1, shipImg2, shipImg3, shipImg4, shipImg5, ship1, ship2, ship3, ship4, ship5
     menu.pack_forget()
     board.pack(expand=True, fill=BOTH)
     for i in range(10):
         for j in range(10):
             exec("button" + str(i) + str(j) + " = PlaceButton(" + str(i + 1) + "," + str(j + 1) + ")")
 
-    ship1 = ShipCreator() # TODO: Actually finish this and all the stuff below it. Such an L
-    ship2 = ShipCreator()
-    ship3 = ShipCreator()
-    ship4 = ShipCreator()
-    ship5 = ShipCreator()
+    ship1 = ShipCreator(5, shipImg1, 0)
+    ship2 = ShipCreator(4, shipImg2, 0)
+    ship3 = ShipCreator(3, shipImg3, 0)
+    ship4 = ShipCreator(4, shipImg4, 1)
+    ship5 = ShipCreator(5, shipImg5, 1)
 
 
 def open_how_to():
