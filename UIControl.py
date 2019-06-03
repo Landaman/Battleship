@@ -5,17 +5,6 @@ from PIL import ImageTk, Image
 # Difficulty variable
 difficulty = None
 
-# Images
-backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
-backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
-gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
-gridImageTK = ImageTk.PhotoImage(gridImage)
-shipImg1 = Image.open("Assets/Ship1(5).png")
-shipImg2 = Image.open("Assets/Ship2(4).png")
-shipImg3 = Image.open("Assets/Ship3(3).png")
-shipImg4 = Image.open("Assets/Ship4(4).png")
-shipImg5 = Image.open("Assets/Ship5(2).png")
-
 # Constants
 BOARD_OFFSET = 25
 
@@ -27,6 +16,19 @@ menu = Frame(main)
 howTo = Frame(main)
 settings = Frame(main)
 board = Frame(main)
+
+# Images
+backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
+backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
+gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
+gridImageTK = ImageTk.PhotoImage(gridImage)
+shipImg1 = Image.open("Assets/Ship1(5).jpg")
+shipImg2 = Image.open("Assets/Ship2(4).jpg")
+shipImg3 = Image.open("Assets/Ship3(3).jpg")
+shipImg4 = Image.open("Assets/Ship4(4).jpg")
+shipImg5 = Image.open("Assets/Ship5(2).jpg")
+
+# Backgrounds
 menuBackground = Label(menu, image=backgroundImageTK)
 howToBackground = Label(howTo, image=backgroundImageTK)
 settingsBackground = Label(settings, image=backgroundImageTK)
@@ -96,7 +98,7 @@ class PlaceButton:
         self.xcoord = xcoord
         self.ycoord = ycoord
         self.button = Button(playerBoard, image=backgroundImageTK, command=self.place)
-        self.button.place(x=78 * xcoord + 8, y=78 * xcoord + 8 + BOARD_OFFSET, anchor=NW)
+        self.button.place(x=78 * xcoord + 8, y=78 * xcoord + 8 + BOARD_OFFSET, anchor=NW, height=78, width=78)
 
     def place(self):
         if ShipCreator.activeShip is not None:
