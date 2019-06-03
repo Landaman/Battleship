@@ -11,7 +11,7 @@ for i in range(10):  # This creates the stock board
 AIBoard = BASE_BOARD
 playerBoard = BASE_BOARD
 
-#player turn
+#player turn is set up on a system that checks if a coord has a ship in it (ship on coord -> "full")
 def pturn(){
 ptarget = input("Enter the coorfinates of your desired target")
     if ptarget = full{
