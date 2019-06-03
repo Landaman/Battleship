@@ -24,9 +24,3 @@ ptarget = input("Enter the coorfinates of your desired target")
     }
     #(begin AI turn)
     }
-    
-    #AI turn
-def aiturn(){
-    
-
-}
