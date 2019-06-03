@@ -1,5 +1,6 @@
 # This is the AI Control, both board setup and actual moves
 import random
+import UIcontrol.setup_menu()
 
 #AI turn based on same system as player turn
 def aiturn(){
