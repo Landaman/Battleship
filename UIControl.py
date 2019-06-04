@@ -60,17 +60,18 @@ class ShipCreator:
         can_place = True
         for i in range(self.length + 1):
             if self.direction == 0:
-                if Main.playerBoard[xcoord][ycoord + i] != " ":
+                if ycoord + i < 10 and Main.playerBoard[xcoord][ycoord + i] != " ":
                     can_place = False
                     break
             else:
-                if Main.playerBoard[xcoord + i][ycoord] != " ":
+                if xcoord + i < 10 and Main.playerBoard[xcoord + i][ycoord] == " ":
                     can_place = False
                     break
         return can_place
 
     def place(self, xcoord, ycoord):
         import Main
+        global playerBoard
         if self.check_place(xcoord, ycoord):
             playerBoard.create_image(78 * xcoord + 8, 78 * xcoord + 8 + BOARD_OFFSET, image=self.imageTk, anchor=NW)
             for i in range(self.length + 1):
@@ -84,7 +85,6 @@ class ShipCreator:
                 for i in range(10):
                     for j in range(10):
                         exec("del button" + str(i) + str(j))
-
                 del ship1, ship2, ship3, ship4, ship5
                 # TODO: what the hell else can i do
         else:
@@ -113,7 +113,6 @@ def open_game():  # Initializes the game, making the grid buttons for the player
     for i in range(10):
         for j in range(10):
             exec("button" + str(i) + str(j) + " = PlaceButton(" + str(i + 1) + "," + str(j + 1) + ")")
-
     ship1 = ShipCreator(5, shipImg1, 0)
     ship2 = ShipCreator(4, shipImg2, 0)
     ship3 = ShipCreator(3, shipImg3, 0)
