@@ -12,9 +12,6 @@ BOARD_OFFSET = 25
 main = Tk()
 main.title("Battleship")
 main.geometry("2286x1254")
-menu = Frame(main)
-howTo = Frame(main)
-settings = Frame(main)
 board = Frame(main)
 
 # Images
@@ -28,14 +25,41 @@ shipImg3 = Image.open("Assets/Ship3(3).jpg")
 shipImg4 = Image.open("Assets/Ship4(4).jpg")
 shipImg5 = Image.open("Assets/Ship5(2).jpg")
 
-# Backgrounds
-menuBackground = Label(menu, image=backgroundImageTK)
-howToBackground = Label(howTo, image=backgroundImageTK)
-settingsBackground = Label(settings, image=backgroundImageTK)
-gameBackground = Label(board, image=backgroundImageTK)
-
 
 # Classes
+class MainApplication(Frame):
+    def __init__(self, parent, *args, **kwargs):
+        Frame.__init__(self, parent, *args, **kwargs)
+        self.background = Label(self, image=backgroundImageTK)
+        self.background.place(x=0, y=0, relwidth=1, relheight=1)
+
+
+class Menu(MainApplication):
+    def __init__(self, parent, *args, **kwargs):
+        MainApplication.__init__(self, parent, *args, **kwargs)
+        self.buttonHolder = Frame(self)
+        self.buttonHolder.place(relx=.5, rely=.45, anchor=CENTER)
+
+    class MenuElement(MainApplication):
+        def open(self):
+            self.parent.pack_forget()
+            self.pack(expand=True, fill=BOTH)
+
+        def close(self):
+            self.pack_forget()
+            self.parent.pack(expand=True, fill=BOTH)
+
+        def __init__(self, name, root, parent, *args, **kwargs):
+            MainApplication.__init__(self, root, *args, **kwargs)
+            self.parent = parent
+            self.buttonPack = Frame(self)
+            self.buttonPack.place(relx=.5, rely=.45, anchor=CENTER)
+            self.button = Button(parent.buttonHolder, text=name, command=self.open)
+            self.button.pack()
+            self.returnButton = Button(self.buttonPack, text="Back", command=self.close)
+            self.returnButton.pack(side=BOTTOM)
+
+
 class ShipCreator:
     global board, BOARD_OFFSET
     ShipHolder = Frame(board)
@@ -59,14 +83,17 @@ class ShipCreator:
         import Main
         can_place = True
         for i in range(self.length + 1):
-            if self.direction == 0:
-                if ycoord + i < 10 and Main.playerBoard[xcoord][ycoord + i] != " ":
+            if self.direction == 0 and xcoord < 10 and ycoord + i < 10:
+                if Main.playerBoard[xcoord][ycoord + i] != " ":
+                    can_place = False
+                    break
+            elif self.direction == 1 and xcoord + i > 10 and ycoord > 10:
+                if Main.playerBoard[xcoord + i][ycoord] != " ":
                     can_place = False
                     break
             else:
-                if xcoord + i < 10 and Main.playerBoard[xcoord + i][ycoord] == " ":
-                    can_place = False
-                    break
+                can_place = False
+                break
         return can_place
 
     def place(self, xcoord, ycoord):
@@ -79,6 +106,7 @@ class ShipCreator:
                     Main.playerBoard[xcoord][ycoord + i] = "S"
                 else:
                     Main.playerBoard[xcoord + i][ycoord] = "S"
+            self.button.pack_forget()
             del self.button
             ShipCreator.shipNum -= 1
             if ShipCreator.shipNum == 0:
@@ -86,7 +114,7 @@ class ShipCreator:
                     for j in range(10):
                         exec("del button" + str(i) + str(j))
                 del ship1, ship2, ship3, ship4, ship5
-                # TODO: what the hell else can i do
+                # TODO: Start actual game flow here
         else:
             ShipCreator.activeShip = None
             actionLabel.configure(text="Cannot place a ship there!")
@@ -105,7 +133,7 @@ class PlaceButton:
             ShipCreator.activeShip.place(self.xcoord, self.ycoord)
 
 
-# Menu UI commands
+# Menu UI command
 def open_game():  # Initializes the game, making the grid buttons for the players ships
     global shipImg1, shipImg2, shipImg3, shipImg4, shipImg5, ship1, ship2, ship3, ship4, ship5
     menu.pack_forget()
@@ -120,70 +148,6 @@ def open_game():  # Initializes the game, making the grid buttons for the player
     ship5 = ShipCreator(5, shipImg5, 1)
 
 
-def open_how_to():
-    menu.pack_forget()
-    howTo.pack(expand=True, fill=BOTH)
-
-
-def open_settings():
-    menu.pack_forget()
-    settings.pack(expand=True, fill=BOTH)
-
-
-# Menu UI elements
-menuButtons = Label(menu)
-playButton = Button(menuButtons, text="Play", command=open_game)
-howToButton = Button(menuButtons, text="How to Play", command=open_how_to)
-settingsButton = Button(menuButtons, text="Settings", command=open_settings)
-menuBackground.place(x=0, y=0, relwidth=1, relheight=1)
-playButton.pack()
-howToButton.pack()
-menuButtons.place(anchor=CENTER, relx=.5, rely=.45)
-settingsButton.pack()
-
-
-# How To UI commands
-def how_to_return():
-    howTo.pack_forget()
-    menu.pack(expand=True, fill=BOTH)
-
-
-# How To UI elements
-howToElements = Frame(howTo)
-howToText = Text(howToElements, width=30, height=10)
-howToText.insert(END, "You and your AI opponent will place ships on a grid and take turns guessing where the other "
-                      "player's ships are. When placing a vertical ship, click the ship then click where you want the "
-                      "top of the ship to be on the board. When placing a horizontal ship, click the ship "
-                      "then click where you want the left end of the ship to be on the board.")
-howToText.configure(state=DISABLED)
-howToReturn = Button(howToElements, text="Back", command=how_to_return)
-howToBackground.place(x=0, y=0, relwidth=1, relheight=1)
-howToText.pack(side=TOP)
-howToElements.place(anchor=CENTER, relx=.5, rely=.45)
-howToReturn.pack(side=TOP)
-
-
-# Settings UI commands
-def settings_return():
-    settings.pack_forget()
-    menu.pack(expand=True, fill=BOTH)
-
-
-# Settings UI elements
-optionsArea = Frame(settings)
-settingsLabel = Label(optionsArea, text="Difficulty:")
-D1 = Radiobutton(optionsArea, text="Easy", variable=difficulty, value=1)
-D2 = Radiobutton(optionsArea, text="Medium", variable=difficulty, value=2)
-D3 = Radiobutton(optionsArea, text="Hard", variable=difficulty, value=3)
-settingsReturn = Button(optionsArea, text="Back", command=settings_return)
-settingsBackground.place(x=0, y=0, relwidth=1, relheight=1)
-settingsLabel.pack(side=TOP)
-D1.pack(anchor=W, side=TOP)
-D2.pack(anchor=W, side=TOP)
-D3.pack(anchor=W, side=TOP)
-optionsArea.place(anchor=CENTER, relx=.5, rely=.45)
-settingsReturn.pack(side=TOP)
-
 # Game board UI elements
 actionLabel = Label(board, text="Click on a ship to place:")
 playerBoard = Canvas(board)
@@ -195,6 +159,27 @@ playerBoard.place(x=0, y=BOARD_OFFSET, width=800, height=800)
 
 # Initial setup and game execution functions
 def setup_menu():
-    menuBackground.place(x=0, y=0, relwidth=1, relheight=1)
+    global menu
+    menu = Menu(main)
+    menu.playButton = Button(menu.buttonHolder, text="Play", command=open_game)
+    menu.playButton.pack()
+    menu.howTo = menu.MenuElement("How To", main, menu)
+    menu.howTo.text = Text(menu.howTo.buttonPack, width=30, height=10)
+    menu.howTo.text.insert(END,
+                           "You and your AI opponent will place ships on a grid and take turns guessing where the "
+                           "other player's ships are. When placing a vertical ship, click the ship then click where "
+                           "you want the top of the ship to be on the board. When placing a horizontal ship, "
+                           "click the ship then click where you want the left end of the ship to be on the board.")
+    menu.howTo.text.configure(state=DISABLED)
+    menu.howTo.text.pack()
+    menu.settings = menu.MenuElement("Settings", main, menu)
+    menu.settings.settingsLabel = Label(menu.settings.buttonPack, text="Difficulty:")
+    menu.settings.D1 = Radiobutton(menu.settings.buttonPack, text="Easy", variable=difficulty, value=1)
+    menu.settings.D2 = Radiobutton(menu.settings.buttonPack, text="Medium", variable=difficulty, value=2)
+    menu.settings.D3 = Radiobutton(menu.settings.buttonPack, text="Hard", variable=difficulty, value=3)
+    menu.settings.settingsLabel.pack(side=TOP)
+    menu.settings.D1.pack(anchor=W, side=TOP)
+    menu.settings.D2.pack(anchor=W, side=TOP)
+    menu.settings.D3.pack(anchor=W, side=TOP)
     menu.pack(expand=True, fill=BOTH)
     main.mainloop()
