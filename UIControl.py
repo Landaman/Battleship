@@ -7,6 +7,11 @@ difficulty = None
 
 # Constants
 BOARD_OFFSET = 25
+BOARD_WIDTH = 996
+BOARD_HEIGHT = 992
+BOX_WIDTH = 97
+BOX_HEIGHT = 97
+BOX_OFFSET = 8
 
 # Main UI elements
 main = Tk()
@@ -88,9 +93,9 @@ class GameBoard(Frame):
         self.AIBoard = self.playerBoard
         self.actionLabel = Label(text="Click on a ship to place:")
         self.actionLabel.pack()
-        self.playerBoard.place(x=0, y=BOARD_OFFSET, width=800, height=800)
+        self.playerBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self.shipHolder = Frame(self)
-        self.shipHolder.place(x=800, y=BOARD_OFFSET)
+        self.shipHolder.place(x=1000, y=BOARD_OFFSET)
         self.ships = []
         self.buttons = []
         self.activeShip = None
@@ -101,15 +106,15 @@ class GameBoard(Frame):
         self.ships.append(self.ShipCreator(self, 2, shipImg5, 1))
         for i in range(10):
             for j in range(10):
-                self.buttons.append(self.PlaceButton(self, i + 1, j + 1))
+                self.buttons.append(self.PlaceButton(self, i, j))
 
     def show_player_board(self):
         self.AIBoard.place_forget()
-        self.playerBoard.place(x=0, y=BOARD_OFFSET, width=800, height=800)
+        self.playerBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
     def show_ai_board(self):
         self.playerBoard.place_forget()
-        self.AIBoard.place(x=0, y=BOARD_OFFSET, width=800, height=800)
+        self.AIBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
     class ShipCreator:
         def __init__(self, parent, length, image, direction):
@@ -120,6 +125,7 @@ class GameBoard(Frame):
             self.direction = direction
             self.button = Button(self.parent.shipHolder, image=self.imageTk, command=self.start_place)
             self.button.pack()
+            self.image = Label(self.parent, image=self.imageTk)
 
         def start_place(self):
             self.parent.actionLabel.configure(text="Click where you'd like the bottom/left of the ship to be:")
@@ -128,12 +134,12 @@ class GameBoard(Frame):
         def check_place(self, xcoord, ycoord):
             import Main
             can_place = True
-            for i in range(self.length + 1):
+            for i in range(self.length):
                 if self.direction == 0 and xcoord < 10 and ycoord + i < 10:
                     if Main.playerBoard[xcoord][ycoord + i] != " ":
                         can_place = False
                         break
-                elif self.direction == 1 and xcoord + i > 10 and ycoord > 10:
+                elif self.direction == 1 and xcoord + i < 10 and ycoord < 10:
                     if Main.playerBoard[xcoord + i][ycoord] != " ":
                         can_place = False
                         break
@@ -145,24 +151,31 @@ class GameBoard(Frame):
         def place(self, xcoord, ycoord):
             import Main
             if self.check_place(xcoord, ycoord):
-                self.parent.playerBoard.create_image(78 * xcoord + 8, 78 * xcoord + 8 + BOARD_OFFSET, image=self.imageTk, anchor=NW)
-                for i in range(self.length + 1):
+                self.parent.playerBoard.create_image(BOX_WIDTH * xcoord + BOX_OFFSET, BOX_HEIGHT * ycoord + BOX_OFFSET,
+                                                     image=self.imageTk, anchor=NW)
+                for i in range(self.length):
                     if self.direction == 0:
                         Main.playerBoard[xcoord][ycoord + i] = "S"
                     else:
                         Main.playerBoard[xcoord + i][ycoord] = "S"
+                self.image.place(x=BOX_WIDTH * xcoord + BOX_OFFSET, y=BOX_HEIGHT * ycoord + BOX_OFFSET + BOARD_OFFSET)
                 self.button.pack_forget()
-                del self.button
                 self.parent.ships.remove(self)
                 if len(self.parent.ships) == 0:
                     for i in self.parent.buttons:
-                        i.place_forget()
+                        i.cleanup()
+                    for i in self.parent.ships:
+                        i.cleanup()
                     del self.parent.buttons
                     del self.parent.ships
                     # TODO: Start actual game flow here
             else:
                 self.parent.activeShip = None
                 self.parent.actionLabel.configure(text="Cannot place a ship there!")
+
+        def cleanup(self):
+            self.image.place_forget()
+            self.parent.remove(self)
 
     class PlaceButton:
         def __init__(self, parent, xcoord, ycoord):
@@ -171,14 +184,18 @@ class GameBoard(Frame):
             self.ycoord = ycoord
             self.parent = parent
             self.button = Button(self.parent.playerBoard, image=backgroundImageTK, command=self.place)
-            self.button.place(x=78 * xcoord + 8, y=78 * xcoord + 8 + BOARD_OFFSET, anchor=NW, height=78, width=78)
+            self.button.place(x=BOX_WIDTH * self.xcoord + 8, y=BOX_HEIGHT * self.ycoord + 8, anchor=NW, height=BOX_WIDTH, width=BOX_HEIGHT)
 
         def place(self):
             if self.parent.activeShip is not None:
                 self.parent.activeShip.place(self.xcoord, self.ycoord)
 
+        def cleanup(self):
+            self.button.place_forget()
+            self.parent.buttons.remove(self)
 
-# Menu UI command
+
+# Game initializer
 def open_game():  # Initializes the game, making the grid buttons for the players ships
     global board
     menu.pack_forget()
