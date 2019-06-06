@@ -59,7 +59,7 @@ menu.pack()  # This finally places something we can see
 root.mainloop()  # This generates the main window
 ```
 
-There is odviously a lot more that can be done with this, and a lot more to be explained, but that is the basics for UI Programming.
+There is obviously a lot more that can be done with this, and a lot more to be explained, but that is the basics for UI Programming.
 
 # Combining UI and Object Based Programming
 In the last example, we created 5 global variables, making a non-functional menu and settings window. As you can imagine, when creating a functional UI it is very easy to create lots of global variables to make your UI work. Naturally, this can quickly add complexity to your program, making it harder and more time consuming to understand and debug. A simple way to manage this complexity is with classes. Here is a quick example on how the above example into 3 global variables:
