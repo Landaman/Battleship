@@ -49,7 +49,7 @@ We decided that UI based programming would make our program more interesting, de
 ```python
 import tkinter as Tk  # Common convention, renaming Tkinter into something more consise
 root = Tk.Tk()  # Main screen
-menu = Tk.Frame(root)  # The paramenter is what the frame is going to be displayed on
+menu = Tk.Frame(root)  # The parameter is what the frame is going to be displayed on
 settings = Tk.Frame(root)
 menuLabel = Tk.Label(menu, text="Menu:")
 menuLabel.pack()  # This places the menu label into its parent, in this case the menu object
