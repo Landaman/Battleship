@@ -1,5 +1,5 @@
 # This is the UI Controls. It will also handle player side input
-from tkinter import *
+import tkinter as tk
 from PIL import ImageTk, Image
 
 # Difficulty variable
@@ -14,7 +14,7 @@ BOX_HEIGHT = 97
 BOX_OFFSET = 8
 
 # Main UI elements
-main = Tk()
+main = tk.Tk()
 main.title("Battleship")
 main.geometry("2286x1254")
 
@@ -31,79 +31,81 @@ shipImg5 = Image.open("Assets/Ship5(2).jpg")
 
 
 # Classes
-class MainApplication(Frame):
+class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent, *args, **kwargs)
-        self.background = Label(self, image=backgroundImageTK)
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.background = tk.Label(self, image=backgroundImageTK)
         self.background.place(x=0, y=0, relwidth=1, relheight=1)
 
 
 class Menu(MainApplication):
     def __init__(self, parent, *args, **kwargs):
         MainApplication.__init__(self, parent, *args, **kwargs)
-        self.buttonHolder = Frame(self)
-        self.buttonHolder.place(relx=.5, rely=.45, anchor=CENTER)
-        self.playButton = Button(self.buttonHolder, text="Play", command=open_game)
+        self.buttonHolder = tk.Frame(self)
+        self.buttonHolder.place(relx=.5, rely=.45, anchor=tk.CENTER)
+        self.playButton = tk.Button(self.buttonHolder, text="Play", command=open_game)
         self.playButton.pack()
         self.howTo = self.MenuElement("How To", main, self)
-        self.howTo.text = Text(self.howTo.buttonPack, width=30, height=10)
-        self.howTo.text.insert(END,
+        self.howTo.text = tk.Text(self.howTo.buttonPack, width=30, height=10)
+        self.howTo.text.insert(tk.END,
                                "You and your AI opponent will place ships on a grid and take turns guessing where the "
                                "other player's ships are. When placing a vertical ship, click the ship then click where"
                                " you want the top of the ship to be on the board. When placing a horizontal ship, "
                                "click the ship then click where you want the left end of the ship to be on the board.")
-        self.howTo.text.configure(state=DISABLED)
+        self.howTo.text.configure(state=tk.DISABLED)
         self.howTo.text.pack()
         self.settings = self.MenuElement("Settings", main, self)
-        self.settings.settingsLabel = Label(self.settings.buttonPack, text="Difficulty:")
-        self.settings.D1 = Radiobutton(self.settings.buttonPack, text="Easy", variable=difficulty, value=1)
-        self.settings.D2 = Radiobutton(self.settings.buttonPack, text="Medium", variable=difficulty, value=2)
-        self.settings.D3 = Radiobutton(self.settings.buttonPack, text="Hard", variable=difficulty, value=3)
-        self.settings.settingsLabel.pack(side=TOP)
-        self.settings.D1.pack(anchor=W, side=TOP)
-        self.settings.D2.pack(anchor=W, side=TOP)
-        self.settings.D3.pack(anchor=W, side=TOP)
-        self.pack(expand=True, fill=BOTH)
+        self.settings.settingsLabel = tk.Label(self.settings.buttonPack, text="Difficulty:")
+        self.settings.D1 = tk.Radiobutton(self.settings.buttonPack, text="Easy", variable=difficulty, value=1)
+        self.settings.D2 = tk.Radiobutton(self.settings.buttonPack, text="Medium", variable=difficulty, value=2)
+        self.settings.D3 = tk.Radiobutton(self.settings.buttonPack, text="Hard", variable=difficulty, value=3)
+        self.settings.settingsLabel.pack(side=tk.TOP)
+        self.settings.D1.pack(anchor=tk.W, side=tk.TOP)
+        self.settings.D2.pack(anchor=tk.W, side=tk.TOP)
+        self.settings.D3.pack(anchor=tk.W, side=tk.TOP)
+        self.pack(expand=True, fill=tk.BOTH)
 
     class MenuElement(MainApplication):
         def open(self):
             self.parent.pack_forget()
-            self.pack(expand=True, fill=BOTH)
+            self.pack(expand=True, fill=tk.BOTH)
 
         def close(self):
             self.pack_forget()
-            self.parent.pack(expand=True, fill=BOTH)
+            self.parent.pack(expand=True, fill=tk.BOTH)
 
         def __init__(self, name, root, parent, *args, **kwargs):
             MainApplication.__init__(self, root, *args, **kwargs)
             self.parent = parent
-            self.buttonPack = Frame(self)
-            self.buttonPack.place(relx=.5, rely=.45, anchor=CENTER)
-            self.button = Button(parent.buttonHolder, text=name, command=self.open)
+            self.buttonPack = tk.Frame(self)
+            self.buttonPack.place(relx=.5, rely=.45, anchor=tk.CENTER)
+            self.button = tk.Button(parent.buttonHolder, text=name, command=self.open)
             self.button.pack()
-            self.returnButton = Button(self.buttonPack, text="Back", command=self.close)
-            self.returnButton.pack(side=BOTTOM)
+            self.returnButton = tk.Button(self.buttonPack, text="Back", command=self.close)
+            self.returnButton.pack(side=tk.BOTTOM)
 
 
-class GameBoard(Frame):
+class GameBoard(tk.Frame):
+    import Game
+
     def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent, *args, **kwargs)
-        self.playerBoard = Canvas(self)
-        self.playerBoard.create_image(0, 0, image=gridImageTK, anchor=NW)
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.playerBoard = tk.Canvas(self)
+        self.playerBoard.create_image(0, 0, image=gridImageTK, anchor=tk.NW)
         self.AIBoard = self.playerBoard
-        self.actionLabel = Label(text="Click on a ship to place:")
+        self.actionLabel = tk.Label(text="Click on a ship to place:")
         self.actionLabel.pack()
         self.playerBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
-        self.shipHolder = Frame(self)
+        self.shipHolder = tk.Frame(self)
         self.shipHolder.place(x=1000, y=BOARD_OFFSET)
         self.ships = []
         self.buttons = []
         self.activeShip = None
-        self.ships.append(self.ShipCreator(self, 5, shipImg1, 0))
-        self.ships.append(self.ShipCreator(self, 4, shipImg2, 0))
-        self.ships.append(self.ShipCreator(self, 3, shipImg3, 0))
-        self.ships.append(self.ShipCreator(self, 4, shipImg4, 1))
-        self.ships.append(self.ShipCreator(self, 2, shipImg5, 1))
+        self.ships.append(self.ShipCreator(self, self.playerBoard, 5, shipImg1, 0))
+        self.ships.append(self.ShipCreator(self, self.playerBoard, 4, shipImg2, 0))
+        self.ships.append(self.ShipCreator(self, self.playerBoard, 3, shipImg3, 0))
+        self.ships.append(self.ShipCreator(self, 4, self.playerBoard, shipImg4, 1))
+        self.ships.append(self.ShipCreator(self, 2, self.playerBoard, shipImg5, 1))
         for i in range(10):
             for j in range(10):
                 self.buttons.append(self.PlaceButton(self, i, j))
@@ -116,48 +118,26 @@ class GameBoard(Frame):
         self.playerBoard.place_forget()
         self.AIBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
-    class ShipCreator:
-        def __init__(self, parent, length, image, direction):
-            # Length is the length integer, image an image, direction is 0 for facing up/down, 1 for facing left/right
+    class ShipCreator(Game.Ship):
+        def __init__(self, parent, parent_board, length, image, direction):
+            import Game
+            Game.Ship.__init__(self, image, parent_board, length, direction)
             self.length = length
             self.imageTk = ImageTk.PhotoImage(image)
             self.parent = parent
             self.direction = direction
-            self.button = Button(self.parent.shipHolder, image=self.imageTk, command=self.start_place)
+            self.button = tk.Button(self.parent.shipHolder, image=self.imageTk, command=self.start_place)
             self.button.pack()
-            self.image = Label(self.parent, image=self.imageTk)
+            self.image = tk.Label(self.parent, image=self.imageTk)
 
         def start_place(self):
             self.parent.actionLabel.configure(text="Click where you'd like the bottom/left of the ship to be:")
             self.parent.activeShip = self
 
-        def check_place(self, xcoord, ycoord):
-            import Main
-            can_place = True
-            for i in range(self.length):
-                if self.direction == 0 and xcoord < 10 and ycoord + i < 10:
-                    if Main.playerBoard[xcoord][ycoord + i] != " ":
-                        can_place = False
-                        break
-                elif self.direction == 1 and xcoord + i < 10 and ycoord < 10:
-                    if Main.playerBoard[xcoord + i][ycoord] != " ":
-                        can_place = False
-                        break
-                else:
-                    can_place = False
-                    break
-            return can_place
-
         def place(self, xcoord, ycoord):
-            import Main
+            import Game
             if self.check_place(xcoord, ycoord):
-                self.parent.playerBoard.create_image(BOX_WIDTH * xcoord + BOX_OFFSET, BOX_HEIGHT * ycoord + BOX_OFFSET,
-                                                     image=self.imageTk, anchor=NW)
-                for i in range(self.length):
-                    if self.direction == 0:
-                        Main.playerBoard[xcoord][ycoord + i] = "S"
-                    else:
-                        Main.playerBoard[xcoord + i][ycoord] = "S"
+                self.board_place(xcoord, ycoord)
                 self.image.place(x=BOX_WIDTH * xcoord + BOX_OFFSET, y=BOX_HEIGHT * ycoord + BOX_OFFSET + BOARD_OFFSET)
                 self.button.pack_forget()
                 self.parent.ships.remove(self)
@@ -168,7 +148,7 @@ class GameBoard(Frame):
                         i.cleanup()
                     del self.parent.buttons
                     del self.parent.ships
-                    # TODO: Start actual game flow here
+                    Game.start_game()
             else:
                 self.parent.activeShip = None
                 self.parent.actionLabel.configure(text="Cannot place a ship there!")
@@ -183,8 +163,9 @@ class GameBoard(Frame):
             self.xcoord = xcoord
             self.ycoord = ycoord
             self.parent = parent
-            self.button = Button(self.parent.playerBoard, image=backgroundImageTK, command=self.place)
-            self.button.place(x=BOX_WIDTH * self.xcoord + 8, y=BOX_HEIGHT * self.ycoord + 8, anchor=NW, height=BOX_WIDTH, width=BOX_HEIGHT)
+            self.button = tk.Button(self.parent.playerBoard, image=backgroundImageTK, command=self.place)
+            self.button.place(x=BOX_WIDTH * self.xcoord + 8, y=BOX_HEIGHT * self.ycoord + 8, anchor=tk.NW,
+                              height=BOX_WIDTH, width=BOX_HEIGHT)
 
         def place(self):
             if self.parent.activeShip is not None:
@@ -200,11 +181,16 @@ def open_game():  # Initializes the game, making the grid buttons for the player
     global board
     menu.pack_forget()
     board = GameBoard(main)
-    board.pack(expand=True, fill=BOTH)
+    board.pack(expand=True, fill=tk.BOTH)
 
 
 # Initial setup and game execution functions
 def setup_menu():
+    import Game
     global menu
+    Game.setup_game()
     menu = Menu(main)
     main.mainloop()
+
+
+
