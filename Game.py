@@ -46,7 +46,7 @@ class Ship:
                 else:
                     self.parentBoard[xcoord + i][ycoord] = "S"
             self.parentCanvas.create_image(UIControl.BOX_WIDTH * xcoord + UIControl.BOX_OFFSET, UIControl.BOX_HEIGHT *
-                                          ycoord + UIControl.BOX_OFFSET, image=self.imageTk, anchor=tk.NW)
+                                           ycoord + UIControl.BOX_OFFSET, image=self.imageTk, anchor=tk.NW)
 
     def check_health(self):
         import tkinter as tk
@@ -61,15 +61,9 @@ class Ship:
                 if self.parentBoard[self.xcoord + i][self.ycoord] == "H":
                     damage += 1
         if damage == self.length:
-            if self.direction == 0:
-                for i in range(self.length):
-                    self.parentBoard[self.xcoord][self.ycoord + i] = "D"
-            else:
-                for i in range(self.length):
-                    self.parentBoard[self.xcoord + i][self.ycoord] = "D"
             self.parentCanvas.create_image(UIControl.BOX_WIDTH * self.xcoord + UIControl.BOX_OFFSET,
-                                          UIControl.BOX_HEIGHT * self.ycoord + UIControl.BOX_OFFSET,
-                                          image=self.imageTk, anchor=tk.NW)
+                                           UIControl.BOX_HEIGHT * self.ycoord + UIControl.BOX_OFFSET,
+                                           image=self.imageTk, anchor=tk.NW)
             self.container.remove(self)
             if len(self.container) == 0:
                 winner()
@@ -87,11 +81,9 @@ def ai_move(xcoord, ycoord):
     import UIControl
     if not playerTurn and gameRunning:
         hit = False
-        if playerBoard[xcoord][ycoord] == "S":
+        if playerBoard[xcoord][ycoord] == "S" or playerBoard[xcoord][ycoord] == "H":
             hit = True
             playerBoard[xcoord][ycoord] = "H"
-        elif playerBoard[xcoord][ycoord] == "D":
-            hit = True
         else:
             playerBoard[xcoord][ycoord] = "M"
         for i in UIControl.board.playerShips:
@@ -100,30 +92,32 @@ def ai_move(xcoord, ycoord):
 
 
 def player_move(xcoord, ycoord):
+    import UIControl
+    global AI
     if playerTurn and gameRunning:
-        import UIControl
         hit = False
-        if AIBoard[xcoord][ycoord] == "S":
+        if AIBoard[xcoord][ycoord] == "S" or AIBoard[xcoord][ycoord] == "H":
             hit = True
             AIBoard[xcoord][ycoord] = "H"
-        elif AIBoard[xcoord][ycoord] == "D":
-            hit = True
         else:
             AIBoard[xcoord][ycoord] = "M"
-        for i in UIControl.board.AIShips:
+        for i in AI.ships:
             i.check_health()
         UIControl.board.show_player_move(xcoord, ycoord, hit)
 
 
 def setup_game():
     global AIBoard, playerBoard
-    base_board = []
+    playerBoard = []
+    AIBoard = []
     for i in range(10):  # This creates the stock board
-        base_board.append([])
+        playerBoard.append([])
         for j in range(10):
-            base_board[i].append(" ")
-    AIBoard = base_board
-    playerBoard = base_board
+            playerBoard[i].append(" ")
+    for i in range(10):  # This creates the stock board
+        AIBoard.append([])
+        for j in range(10):
+            AIBoard[i].append(" ")
 
 
 def start_game():

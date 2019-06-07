@@ -5,15 +5,15 @@ class AI:  # This is the AI class.
         import UIControl
         self.difficulty = difficulty
         self.ships = []
-        self.ships.append(Game.Ship(UIControl.board.AIShips, Game.AIBoard, UIControl.board.AIBoard, 5, 0,
+        self.ships.append(Game.Ship(self.ships, Game.AIBoard, UIControl.board.AIBoardCanvas, 5, 0,
                                     UIControl.shipImg1))
-        self.ships.append(Game.Ship(UIControl.board.AIShips, Game.AIBoard, UIControl.board.AIBoard, 4, 0,
+        self.ships.append(Game.Ship(self.ships, Game.AIBoard, UIControl.board.AIBoardCanvas, 4, 0,
                                     UIControl.shipImg2))
-        self.ships.append(Game.Ship(UIControl.board.AIShips, Game.AIBoard, UIControl.board.AIBoard, 3, 0,
+        self.ships.append(Game.Ship(self.ships, Game.AIBoard, UIControl.board.AIBoardCanvas, 3, 0,
                                     UIControl.shipImg3))
-        self.ships.append(Game.Ship(UIControl.board.AIShips, Game.AIBoard, UIControl.board.AIBoard, 4, 1,
+        self.ships.append(Game.Ship(self.ships, Game.AIBoard, UIControl.board.AIBoardCanvas, 4, 1,
                                     UIControl.shipImg4))
-        self.ships.append(Game.Ship(UIControl.board.AIShips, Game.AIBoard, UIControl.board.AIBoard, 2, 1,
+        self.ships.append(Game.Ship(self.ships, Game.AIBoard, UIControl.board.AIBoardCanvas, 2, 1,
                                     UIControl.shipImg5))
 
     def gen_board(self):
