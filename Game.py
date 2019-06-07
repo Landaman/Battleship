@@ -61,9 +61,6 @@ class Ship:
                 if self.parentBoard[self.xcoord + i][self.ycoord] == "H":
                     damage += 1
         if damage == self.length:
-            self.parentCanvas.create_image(UIControl.BOX_WIDTH * self.xcoord + UIControl.BOX_OFFSET,
-                                           UIControl.BOX_HEIGHT * self.ycoord + UIControl.BOX_OFFSET,
-                                           image=self.imageTk, anchor=tk.NW)
             self.container.remove(self)
             if len(self.container) == 0:
                 winner()
@@ -84,10 +81,10 @@ def ai_move(xcoord, ycoord):
         if playerBoard[xcoord][ycoord] == "S" or playerBoard[xcoord][ycoord] == "H":
             hit = True
             playerBoard[xcoord][ycoord] = "H"
+            for i in UIControl.board.playerShips:
+                i.check_health()
         else:
             playerBoard[xcoord][ycoord] = "M"
-        for i in UIControl.board.playerShips:
-            i.check_health()
         UIControl.board.show_ai_move(xcoord, ycoord, hit)
 
 
@@ -99,10 +96,10 @@ def player_move(xcoord, ycoord):
         if AIBoard[xcoord][ycoord] == "S" or AIBoard[xcoord][ycoord] == "H":
             hit = True
             AIBoard[xcoord][ycoord] = "H"
+            for i in AI.ships:
+                i.check_health()
         else:
             AIBoard[xcoord][ycoord] = "M"
-        for i in AI.ships:
-            i.check_health()
         UIControl.board.show_player_move(xcoord, ycoord, hit)
 
 
