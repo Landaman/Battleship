@@ -39,7 +39,7 @@ Here is a breakdown of what everything means:
   
 2. Self is the object. Self.anything means that variable is a parameter of the object, and **can have a unique value for each instance of the class**. Those variables can be accessed in any function of the class by calling self.variablename. They can also be accessed outside of the function by calling classvariablename.variablename. They can also be created at any time, in any function in or outside of the class as long as they follow the conventions above. 
 
-Another use of a class is as a storage system. You can have a class that you only initialize once, but you can have all of your related variables as parameters of the class instead of global variables, simplifiying your program. We used classes in a variety of circumstances, ranging from when we needed to make a 100 different buttons to cover a grid to when we needed to making a menu with only one global variable. 
+Another use of a class is as a storage system. You can have a class that you only initialize once, but you can have all of your related variables as parameters of the class instead of global variables, simplifying your program. We used classes in a variety of circumstances, ranging from when we needed to make a 100 different buttons to cover a grid to when we needed to making a menu with only one global variable. 
 
 
 # Python UI Programming
@@ -69,7 +69,9 @@ In the last example, we created 5 global variables, making a non-functional menu
 import tkinter as tk
 
 class Window(tk.Frame):  # This imports from the Frame class, making your class an extention of the frame class
-  def __init__(self, parent, name, *args, **kwargs):  # Parent is the parent of your frame, name is the name of your frame, *args and **kwargs are simply any other arguments provided, which can be used in the frame
+  def __init__(self, parent, name, *args, **kwargs):  
+  # Parent is the parent of your frame, name is the name of your frame, 
+  # *args and **kwargs are simply any other arguments provided, which can be used in the frame
     tk.Frame.__init__(self, parent, *args, **kwargs)
     self.parent = parent
     self.label =  tk.Label(self, text=name)
