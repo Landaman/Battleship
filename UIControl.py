@@ -2,16 +2,19 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 
-# Difficulty variable
+# Global variables
 difficulty = None
+menu = None
+board = None
+victory = None
 
 # Constants
 BOARD_OFFSET = 25
 BOARD_WIDTH = 996
 BOARD_HEIGHT = 992
+BOX_OFFSET = 8
 BOX_WIDTH = 97
 BOX_HEIGHT = 97
-BOX_OFFSET = 8
 
 # Main UI elements
 main = tk.Tk()
@@ -20,22 +23,36 @@ main.geometry("2286x1254")
 
 # Images
 backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
-backgroundImageTK = ImageTk.PhotoImage(backgroundImage)
 gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
-gridImageTK = ImageTk.PhotoImage(gridImage)
 shipImg1 = Image.open("Assets/Ship1(5).jpg")
 shipImg2 = Image.open("Assets/Ship2(4).jpg")
 shipImg3 = Image.open("Assets/Ship3(3).jpg")
 shipImg4 = Image.open("Assets/Ship4(4).jpg")
 shipImg5 = Image.open("Assets/Ship5(2).jpg")
+missImage = Image.open("Assets/miss.jpg")
+hitImage = Image.open("Assets/hit.jpg")
 
 
 # Classes
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.background = tk.Label(self, image=backgroundImageTK)
+        self.backgroundImageTk = ImageTk.PhotoImage(backgroundImage)
+        self.background = tk.Label(self, image=self.backgroundImageTk)
         self.background.place(x=0, y=0, relwidth=1, relheight=1)
+
+
+class Victory(MainApplication):
+    def __init__(self, winner, parent, *args, **kwargs):
+        MainApplication.__init__(self, parent, *args, **kwargs)
+        self.victoryLabel = tk.Label(self, text=winner + " won!")
+        self.victoryLabel.place(relx=.5, rely=.45, anchor=tk.CENTER)
+        self.quit = tk.Button(self, text="Quit", command=self.quit)
+        self.quit.place(relx=.5, rely=.5, anchor=tk.CENTER)
+        self.pack(expand=True, fill=tk.BOTH)
+
+    def quit(self):
+        main.quit()
 
 
 class Menu(MainApplication):
@@ -89,23 +106,36 @@ class GameBoard(tk.Frame):
     import Game
 
     def __init__(self, parent, *args, **kwargs):
+        import Game
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.playerBoard = tk.Canvas(self)
-        self.playerBoard.create_image(0, 0, image=gridImageTK, anchor=tk.NW)
-        self.AIBoard = self.playerBoard
+        self.gridImageTk = ImageTk.PhotoImage(gridImage)
+        self.missImageTk = ImageTk.PhotoImage(missImage)
+        self.hitImageTk = ImageTk.PhotoImage(hitImage)
+        self.playerBoard.create_image(0, 0, image=self.gridImageTk, anchor=tk.NW)
+        self.AIBoard = tk.Canvas(self)
+        self.AIBoard.create_image(0, 0, image=self.gridImageTk, anchor=tk.NW)
         self.actionLabel = tk.Label(text="Click on a ship to place:")
         self.actionLabel.pack()
         self.playerBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self.shipHolder = tk.Frame(self)
         self.shipHolder.place(x=1000, y=BOARD_OFFSET)
-        self.ships = []
         self.buttons = []
+        self.playerShips = []
+        self.AIShips = []
+        self.moveButtons = []
         self.activeShip = None
-        self.ships.append(self.ShipCreator(self, self.playerBoard, 5, shipImg1, 0))
-        self.ships.append(self.ShipCreator(self, self.playerBoard, 4, shipImg2, 0))
-        self.ships.append(self.ShipCreator(self, self.playerBoard, 3, shipImg3, 0))
-        self.ships.append(self.ShipCreator(self, 4, self.playerBoard, shipImg4, 1))
-        self.ships.append(self.ShipCreator(self, 2, self.playerBoard, shipImg5, 1))
+        self.toBePlaced = 5
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoard, 5, 0,
+                                                 shipImg1))
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoard, 4, 0,
+                                                 shipImg2))
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoard, 3, 0,
+                                                 shipImg3))
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoard, 4, 1,
+                                                 shipImg4))
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoard, 2, 1,
+                                                 shipImg5))
         for i in range(10):
             for j in range(10):
                 self.buttons.append(self.PlaceButton(self, i, j))
@@ -118,14 +148,43 @@ class GameBoard(tk.Frame):
         self.playerBoard.place_forget()
         self.AIBoard.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
+    def setup_buttons(self):
+        for i in range(10):
+            for j in range(10):
+                self.moveButtons.append(self.MoveButton(self.AIBoard, i, j))
+
+    def show_ai_move(self, xcoord, ycoord, hit):
+        import time
+        import Game
+        if hit:
+            self.playerBoard.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+                                          image=self.hitImageTk, anchor=tk.NW)
+        else:
+            self.playerBoard.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+                                          image=self.missImageTk, anchor=tk.NW)
+        self.show_player_board()
+        #time.sleep(45) TODO: Find an alternative to this
+        self.show_ai_board()
+        Game.playerTurn = True
+
+    def show_player_move(self, xcoord, ycoord, hit):
+        import time
+        import Game
+        if hit:
+            self.AIBoard.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+                                      image=self.hitImageTk, anchor=tk.NW)
+        else:
+            self.AIBoard.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+                                      image=self.missImageTk, anchor=tk.NW)
+        #time.sleep(45) TODO: Find an alternative to this
+        Game.playerTurn = False
+        Game.AI.get_hit()
+
     class ShipCreator(Game.Ship):
-        def __init__(self, parent, parent_board, length, image, direction):
+        def __init__(self, parent, parent_container, parent_board, parent_canvas, length, direction, image):
             import Game
-            Game.Ship.__init__(self, image, parent_board, length, direction)
-            self.length = length
-            self.imageTk = ImageTk.PhotoImage(image)
+            Game.Ship.__init__(self, parent_container, parent_board, parent_canvas, length, direction, image)
             self.parent = parent
-            self.direction = direction
             self.button = tk.Button(self.parent.shipHolder, image=self.imageTk, command=self.start_place)
             self.button.pack()
             self.image = tk.Label(self.parent, image=self.imageTk)
@@ -140,14 +199,16 @@ class GameBoard(tk.Frame):
                 self.board_place(xcoord, ycoord)
                 self.image.place(x=BOX_WIDTH * xcoord + BOX_OFFSET, y=BOX_HEIGHT * ycoord + BOX_OFFSET + BOARD_OFFSET)
                 self.button.pack_forget()
-                self.parent.ships.remove(self)
-                if len(self.parent.ships) == 0:
+                self.parent.toBePlaced -= 1
+                self.parent.activeShip = None
+                if self.parent.toBePlaced == 0:
                     for i in self.parent.buttons:
                         i.cleanup()
-                    for i in self.parent.ships:
+                    for i in self.parent.playerShips:
                         i.cleanup()
                     del self.parent.buttons
-                    del self.parent.ships
+                    del self.parent.toBePlaced
+                    self.parent.setup_buttons()
                     Game.start_game()
             else:
                 self.parent.activeShip = None
@@ -155,7 +216,6 @@ class GameBoard(tk.Frame):
 
         def cleanup(self):
             self.image.place_forget()
-            self.parent.remove(self)
 
     class PlaceButton:
         def __init__(self, parent, xcoord, ycoord):
@@ -163,9 +223,10 @@ class GameBoard(tk.Frame):
             self.xcoord = xcoord
             self.ycoord = ycoord
             self.parent = parent
-            self.button = tk.Button(self.parent.playerBoard, image=backgroundImageTK, command=self.place)
-            self.button.place(x=BOX_WIDTH * self.xcoord + 8, y=BOX_HEIGHT * self.ycoord + 8, anchor=tk.NW,
-                              height=BOX_WIDTH, width=BOX_HEIGHT)
+            self.backgroundImageTk = ImageTk.PhotoImage(backgroundImage)
+            self.button = tk.Button(self.parent.playerBoard, image=self.backgroundImageTk, command=self.place)
+            self.button.place(x=BOX_WIDTH * self.xcoord + BOX_OFFSET, y=BOX_HEIGHT * self.ycoord + BOX_OFFSET,
+                              anchor=tk.NW, height=BOX_WIDTH, width=BOX_HEIGHT)
 
         def place(self):
             if self.parent.activeShip is not None:
@@ -173,7 +234,21 @@ class GameBoard(tk.Frame):
 
         def cleanup(self):
             self.button.place_forget()
-            self.parent.buttons.remove(self)
+
+    class MoveButton:
+        def __init__(self, parent, xcoord, ycoord):
+            self.xcoord = xcoord
+            self.ycoord = ycoord
+            self.parent = parent
+            self.backgroundImageTk = ImageTk.PhotoImage(backgroundImage)
+            self.button = tk.Button(self.parent, image=self.backgroundImageTk, command=self.player_move)
+            self.button.place(x=self.xcoord * BOX_WIDTH + BOX_OFFSET, y=self.ycoord * BOX_HEIGHT + BOX_OFFSET,
+                              width=BOX_WIDTH, height=BOX_HEIGHT)
+
+        def player_move(self):
+            import Game
+            self.button.place_forget()
+            Game.player_move(self.xcoord, self.ycoord)
 
 
 # Game initializer
@@ -193,4 +268,7 @@ def setup_menu():
     main.mainloop()
 
 
-
+def setup_victory(winner):
+    global victory
+    board.pack_forget()
+    victory = Victory(main, winner)
