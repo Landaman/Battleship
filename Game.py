@@ -45,8 +45,9 @@ class Ship:
                     self.parentBoard[xcoord][ycoord + i] = "S"
                 else:
                     self.parentBoard[xcoord + i][ycoord] = "S"
-            self.parentCanvas.create_image(UIControl.BOX_WIDTH * xcoord + UIControl.BOX_OFFSET, UIControl.BOX_HEIGHT *
-                                           ycoord + UIControl.BOX_OFFSET, image=self.imageTk, anchor=tk.NW)
+            self.parentCanvas.create_image(UIControl.BOX_WIDTH * xcoord + ((xcoord + 1) * UIControl.BOX_OFFSET),
+                                           UIControl.BOX_HEIGHT * ycoord + ((ycoord + 1) * UIControl.BOX_OFFSET),
+                                           image=self.imageTk, anchor=tk.NW)
 
     def check_health(self):
         import tkinter as tk

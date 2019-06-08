@@ -9,11 +9,12 @@ board = None
 victory = None
 
 # Constants
-BOARD_WIDTH = 996
-BOARD_HEIGHT = 992
+BOARD_OFFSET = 36
+BOARD_WIDTH = 978
+BOARD_HEIGHT = 978
 BOX_OFFSET = 8
-BOX_WIDTH = 97
-BOX_HEIGHT = 97
+BOX_WIDTH = 89
+BOX_HEIGHT = 89
 
 # Main UI elements
 main = tk.Tk()
@@ -21,8 +22,9 @@ main.title("Battleship")
 main.geometry("2286x1254")
 
 # Images
-backgroundImage = Image.open("Assets/sea image.jpg")  # Width 2286, Height 1254
-gridImage = Image.open("Assets/grid.jpg")  # Width 800, Height 800. Rectangles are 8 across, boxes are 89x89
+buttonBackgroundImage = Image.open("Assets/button background.jpg")
+backgroundImage = Image.open("Assets/sea image.jpg")
+gridImage = Image.open("Assets/grid.jpg")
 shipImg1 = Image.open("Assets/Ship1(5).jpg")
 shipImg2 = Image.open("Assets/Ship2(4).jpg")
 shipImg3 = Image.open("Assets/Ship3(3).jpg")
@@ -40,10 +42,11 @@ class MainButton(tk.Button):
         self.ycoord = ycoord
         self.parentArray = parent_array
         self.parentBoard = parent_board
-        self.backgroundImageTk = ImageTk.PhotoImage(backgroundImage)
+        self.backgroundImageTk = ImageTk.PhotoImage(buttonBackgroundImage)
         self.configure(image=self.backgroundImageTk)
-        self.place(x=BOX_WIDTH * self.xcoord + BOX_OFFSET, y=BOX_HEIGHT * self.ycoord + BOX_OFFSET,
-                   height=BOX_WIDTH, width=BOX_HEIGHT, anchor=tk.NW)
+        self.place(x=BOX_WIDTH * self.xcoord + ((self.xcoord + 1) * BOX_OFFSET), y=BOX_HEIGHT * self.ycoord +
+                                               ((self.ycoord + 1) * BOX_OFFSET),
+                   height=BOX_WIDTH + BOX_OFFSET, width=BOX_HEIGHT + BOX_OFFSET, anchor=tk.NW)
 
     def cleanup(self):
         self.place_forget()
@@ -132,11 +135,11 @@ class GameBoard(tk.Frame):
         self.playerBoardCanvas.create_image(0, 0, image=self.gridImageTk, anchor=tk.NW)
         self.AIBoardCanvas = tk.Canvas(self)
         self.AIBoardCanvas.create_image(0, 0, image=self.gridImageTk, anchor=tk.NW)
-        self.actionLabel = tk.Label(text="Click on a ship to place:")
+        self.actionLabel = tk.Label(self, text="Click on a ship to place:")
         self.actionLabel.pack()
-        self.playerBoardCanvas.place(x=0, y=0, width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        self.playerBoardCanvas.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
         self.shipHolder = tk.Frame(self)
-        self.shipHolder.place(x=1000, y=0)
+        self.shipHolder.place(x=1000, y=BOARD_OFFSET)
         self.placeButtons = []
         self.playerShips = []
         self.moveButtons = []
@@ -160,11 +163,11 @@ class GameBoard(tk.Frame):
 
     def show_player_board(self):
         self.AIBoardCanvas.place_forget()
-        self.playerBoardCanvas.place(x=0, y=0, width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        self.playerBoardCanvas.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
     def show_ai_board(self):
         self.playerBoardCanvas.place_forget()
-        self.AIBoardCanvas.place(x=0, y=0, width=BOARD_WIDTH, height=BOARD_HEIGHT)
+        self.AIBoardCanvas.place(x=0, y=BOARD_OFFSET, width=BOARD_WIDTH, height=BOARD_HEIGHT)
 
     def setup_buttons(self):
         for i in range(10):
@@ -174,10 +177,12 @@ class GameBoard(tk.Frame):
 
     def show_ai_move(self, xcoord, ycoord, hit):
         if hit:
-            self.playerBoardCanvas.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+            self.playerBoardCanvas.create_image(xcoord * BOX_WIDTH + ((xcoord + 1) * BOX_OFFSET),
+                                                ycoord * BOX_HEIGHT + ((ycoord + 1) * BOX_OFFSET),
                                                 image=self.hitImageTk, anchor=tk.NW)
         else:
-            self.playerBoardCanvas.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+            self.playerBoardCanvas.create_image(xcoord * BOX_WIDTH + ((xcoord + 1) * BOX_OFFSET),
+                                                ycoord * BOX_HEIGHT + ((ycoord + 1) * BOX_OFFSET),
                                                 image=self.missImageTk, anchor=tk.NW)
         self.actionLabel.configure(text="AI Move:")
         self.proceedButton.place(relx=.75, rely=.5, anchor=tk.CENTER)
@@ -186,10 +191,12 @@ class GameBoard(tk.Frame):
     def show_player_move(self, xcoord, ycoord, hit):
         import Game
         if hit:
-            self.AIBoardCanvas.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+            self.AIBoardCanvas.create_image(xcoord * BOX_WIDTH + ((xcoord + 1) * BOX_OFFSET),
+                                            ycoord * BOX_HEIGHT + ((ycoord + 1) * BOX_OFFSET),
                                             image=self.hitImageTk, anchor=tk.NW)
         else:
-            self.AIBoardCanvas.create_image(xcoord * BOX_WIDTH + BOX_OFFSET, ycoord * BOX_HEIGHT + BOX_OFFSET,
+            self.AIBoardCanvas.create_image(xcoord * BOX_WIDTH + ((xcoord + 1) * BOX_OFFSET),
+                                            ycoord * BOX_HEIGHT + ((ycoord + 1) * BOX_OFFSET),
                                             image=self.missImageTk, anchor=tk.NW)
         Game.playerTurn = False
         Game.AI.get_hit()
@@ -218,10 +225,13 @@ class GameBoard(tk.Frame):
             import Game
             if self.check_place(xcoord, ycoord):
                 self.board_place(xcoord, ycoord)
-                self.image.place(x=BOX_WIDTH * xcoord + BOX_OFFSET, y=BOX_HEIGHT * ycoord + BOX_OFFSET + 0)
+                self.image.place(x=BOX_WIDTH * self.xcoord + ((self.xcoord + 1) * BOX_OFFSET),
+                                 y=BOX_HEIGHT * self.ycoord + ((self.ycoord + 1) * BOX_OFFSET) + BOARD_OFFSET,
+                                 anchor=tk.NW)
                 self.button.pack_forget()
                 self.parent.toBePlaced -= 1
                 self.parent.activePlaceShip = None
+                self.parent.actionLabel.configure(text="Click on a ship to place:")
                 if self.parent.toBePlaced == 0:
                     for i in self.parent.placeButtons:
                         i.cleanup()
@@ -264,16 +274,16 @@ class GameBoard(tk.Frame):
 def open_game():  # Initializes the game, making the grid buttons for the players ships
     global board
     menu.pack_forget()
-    board = GameBoard(main)
     board.pack(expand=True, fill=tk.BOTH)
 
 
 # Initial setup and game execution functions
 def setup_menu():
     import Game
-    global menu, main
+    global menu, main, board
     main.option_add("*Font", "arial 21")
     Game.setup_game()
+    board = GameBoard(main)
     menu = Menu(main)
     main.mainloop()
 
