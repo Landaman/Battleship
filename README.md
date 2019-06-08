@@ -1,6 +1,6 @@
 # Battleship
 
-We decided to make the classic game of Battleship in Python. We decided that we would use a 10x10 grid, and 5 ships. One 5 length, one 4 length, one 3 length, one horizontal 4 length, and one horizontal 2 length. We also decided that it would be more interesting if we were to use an AI as the second player, a proper UI instead of console programming, and object based programming
+We decided to make the classic game of Battleship in Python. We decided that we would use a 10x10 grid, and 5 ships. One 5 length, one 4 length, one 3 length, one horizontal 4 length, and one horizontal 2 length. We also decided that it would be more interesting if we were to use an AI as the second player, a proper UI instead of console programming, and object based programming.
 
 # Python Object Based Programming
 
