@@ -50,8 +50,6 @@ class Ship:
                                            image=self.imageTk, anchor=tk.NW)
 
     def check_health(self):
-        import tkinter as tk
-        import UIControl
         damage = 0
         if self.direction == 0:
             for i in range(self.length):
