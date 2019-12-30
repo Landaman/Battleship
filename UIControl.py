@@ -25,7 +25,7 @@ main.geometry("2286x1254")
 buttonBackgroundImage = Image.open("Assets/button background.jpg")
 backgroundImage = Image.open("Assets/sea image.jpg")
 gridImage = Image.open("Assets/grid.jpg")
-shipImg1 = Image.open("Assets/Ship1(5).jpg")
+shipImg1 = Image.open("Assets/Ship1(4).jpg")
 shipImg2 = Image.open("Assets/Ship2(4).jpg")
 shipImg3 = Image.open("Assets/Ship3(3).jpg")
 shipImg4 = Image.open("Assets/Ship4(4).jpg")
@@ -178,7 +178,7 @@ class GameBoard(tk.Frame):
         self.parent = parent
         self.proceedButton = None
         # These are the players ships.
-        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoardCanvas, 5, 0,
+        self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoardCanvas, 4, 0,
                                                  shipImg1))
         self.playerShips.append(self.ShipCreator(self, self.playerShips, Game.playerBoard, self.playerBoardCanvas, 4, 0,
                                                  shipImg2))
